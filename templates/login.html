@@ -1,0 +1,133 @@
+{#<?php#}
+{#date_default_timezone_set("Asia/Calcutta");#}
+{#session_start();#}
+{#if (isset($_SESSION['login'])) {#}
+{#	if ($_SESSION['login'] == "admin") {#}
+{#		header('location:./admin/');#}
+{#		exit;#}
+{#	}#}
+{#}#}
+{#if (isset($_POST['email'])) {#}
+{#	extract($_POST);#}
+{#	include "./database.php";#}
+{#	$query = "SELECT * FROM userdetails WHERE email='$email'";#}
+{#	$result = mysqli_query($conn, $query);#}
+{#	if ($result) {#}
+{#		if (mysqli_num_rows($result) > 0) {#}
+{#			$query = "SELECT * FROM userdetails WHERE email='$email' And password='$password'";#}
+{#			$result = mysqli_query($conn, $query);#}
+{#			if ($result) {#}
+{#				if (mysqli_num_rows($result) == 1) {#}
+{#					$data = mysqli_fetch_row($result);#}
+{#					if ($data[5] == "admin") {#}
+{#						session_destroy();#}
+{#						session_unset();#}
+{#						session_start();#}
+{#						$_SESSION['id'] = $data[0];#}
+{#						$_SESSION['name'] = $data[1];#}
+{#						$_SESSION['email'] = $data[2];#}
+{#						$_SESSION['image'] = $data[7];#}
+{#						$_SESSION['login'] = "admin";#}
+{#						header('location:./admin/');#}
+{#					} else {#}
+{#						echo "<script>alert('invalid user please login to driver login');document.location='./login.php';</script>";#}
+{#					}#}
+{#					exit;#}
+{#				} else {#}
+{#					if (!isset($_SESSION['attempt'])) {#}
+{#						$_SESSION['attempt'] = 0;#}
+{#					}#}
+{#					$_SESSION['attempt'] = $_SESSION['attempt'] + 1;#}
+{#					if ($_SESSION['attempt'] >= 3) {#}
+{#						//getcurrent time and add to session#}
+{#						$_SESSION['block'] = "true";#}
+{#						echo "<br>user blocked";#}
+{#					}#}
+{#					$_SESSION['unlocktime'] = date("H:i:s", strtotime(date("H:i:s") . " +10 minutes"));#}
+{#					echo $_SESSION['attempt'];#}
+{#					echo "<script>alert('invalid password');document.location='./login.php';</script>";#}
+{#				}#}
+{#			} else {#}
+{#				echo "<script>alert('bad request password');document.location='./login.php';</script>";#}
+{#			}#}
+{#		} else {#}
+{#			echo "<script>alert('invalid user');document.location='./login.php';</script>";#}
+{#		}#}
+{#	} else {#}
+{#		echo "<script>alert('bad request');document.location='./login.php';</script>";#}
+{#	}#}
+{#	exit;#}
+{#}#}
+{#$block = false;#}
+{#if (isset($_SESSION['block'])) {#}
+{#	if ($_SESSION['block'] == "true") {#}
+{#		$block = true;#}
+{#		$unlocktime = $_SESSION['unlocktime'];#}
+{#		if ($unlocktime <= date("H:i:s")) {#}
+{#			$_SESSION['unlocktime'] = "";#}
+{#			$_SESSION['block'] = "false";#}
+{#			$_SESSION['attempt'] = 0;#}
+{#			$block = false;#}
+{#		}#}
+{#	}#}
+{#}#}
+{#$remaining = 3;#}
+{#if (isset($_SESSION['attempt'])) {#}
+{#	if ($_SESSION['attempt'] > 0) {#}
+{#		$unlocktime = $_SESSION['unlocktime'];#}
+{#		$remaining = 3 - $_SESSION['attempt'];#}
+{#		if ($remaining < 0) {#}
+{#			$remaining = 0;#}
+{#		}#}
+{#		if ($unlocktime <= date("H:i:s")) {#}
+{#			$_SESSION['unlocktime'] = "";#}
+{#			$_SESSION['block'] = "false";#}
+{#			$_SESSION['attempt'] = 0;#}
+{#			$block = false;#}
+{#		}#}
+{#	}#}
+{#}#}
+{#?>#}
+
+{% include "header.html" %}
+
+<div id="maindiv">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='/fonts/font-awesome-4.7.0/css/font-awesome.min.css')}} ">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='/fonts/iconic/css/material-design-iconic-font.min.css')}}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='/css/util.css')}}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='/css/login.css')}}">
+
+	<div class="limiter">
+		<div class="container-login100">
+			<div class="wrap-login100 p-l-55 p-r-55 p-t-65 p-b-54">
+
+				<form class="login100-form validate-form" method="post" action="{{ url_for('dashboard') }}">
+					<span class="login100-form-title p-b-30">
+						Login Here
+					</span>
+					<div class="wrap-input100 validate-input m-b-23">
+                        <label for="email">Email</label>
+                        {{ form.email(placeholder="Type your email", class="input100") }}
+						<span class="focus-input100" data-symbol="&#xf206;"></span>
+					</div>
+					<div class="wrap-input100 validate-input">
+                        <label for="passwords">Password</label>
+                        {{ form.password(placeholder="Type your password", class="input100") }}
+						<span class="focus-input100" data-symbol="&#xf190;"></span>
+					</div><br>
+					<div class="container-login100-form-btn">
+						<div class="wrap-login100-form-btn">
+							<div class="login100-form-bgbtn"></div>
+							<button class="login100-form-btn">
+								Login
+							</button>
+						</div>
+					</div>
+				</form>
+
+			</div>
+		</div>
+	</div>
+	<!-- end of frontend code -->
+</div>
+{% include "footer.html" %}

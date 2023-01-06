@@ -1,0 +1,81 @@
+{#<?php#}
+{#$page = "manage-bus";#}
+{#include "./header.php";#}
+{#?>#}
+{#<?php#}
+{##}
+{#// Connecting to the Database#}
+{#include "./database.php";#}
+{##}
+{#$arr = [];#}
+{#$sql = "SELECT * FROM `bus_list`";           //table name#}
+{#$result = mysqli_query($conn, $sql);#}
+{##}
+{#if($result){#}
+{#    while($row=mysqli_fetch_row($result)){#}
+{#        array_push($arr,$row);#}
+{##}
+{#    }#}
+{#}#}
+{##}
+{#?>#}
+
+<style>
+    .bus-section {
+        border: ridge;
+        padding: 10px;
+        border-radius: 30px;
+        background: #ffd27f73;
+        /* background: linear-gradient(145deg, #b3a6e6, #d5c5ff);
+        box-shadow: 7px 7px 14px #9b90c7,
+            -7px -7px 14px #f3e0ff; */
+    }
+</style>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <center>
+                <h4>
+                    Manage Bus
+                </h4>
+            </center>
+        </div>
+        <div class="col-md-2" style="text-align: right;">
+            <a href="bus.php" class="btn btn-outline-success">Add Bus</a>
+        </div>
+    </div>
+    <hr class="hr">
+    <section id="bus-list">
+        <?php
+        for ($i = 0; $i < sizeof($arr); $i++) {
+        ?>
+            <div class="bus-section">
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-8">
+                        <h4>
+                        <?php
+                                echo $arr[$i][1];                            
+                            ?>
+                        </h4>
+                        <p>
+                            Active Driver :-
+                            <?php
+                                echo $arr[$i][4];                            
+                            ?>
+                        </p>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="./bus.php?bus=1" class="btn btn-outline-primary mb-1">Edit Details</a>
+                    </div>
+                </div>
+            </div><br><br>
+        <?php
+        }
+        ?>
+    </section>
+</div>
+
+{% include "footer.html" %}

@@ -1,0 +1,207 @@
+<?php
+if (isset($_POST['name'])) {
+    extract($_POST);
+    include "./database.php";
+    $query = "INSERT INTO `bus_list`(`bus_number`, `start_point`, `end_point`, `driver`, `image`) 
+    VALUES ('$busNo','$startingPoint','$destination','$driver','../images/yogesh_travels.png')";
+    $result = mysqli_query($conn, $query);
+    if ($result) {
+        echo "<script>alert('Bus added');
+        document.location='./bus.php';</script>";
+    } 
+    else {
+        echo "<script>console.log(\"".mysqli_error($conn)."\");
+        alert('exec fail');
+        document.location='./manage-user.html';
+        </script>";
+    }
+    exit;
+}
+?>
+
+<?php include "./header.php"; ?>
+
+<style>
+    .form-floating label {
+        color: black;
+    }
+
+    .form-signin {
+        width: 100%;
+        padding: 15px;
+        margin: auto;
+    }
+
+    .form-signin .checkbox {
+        font-weight: 400;
+    }
+
+    .form-signin .form-floating:focus-within {
+        z-index: 2;
+    }
+
+    .form-signin input {
+        margin-bottom: 20px;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+
+    .footer {
+        padding: 10px;
+        background: rgba(1, 1, 1, 0.8);
+    }
+</style>
+<div style="margin: 10px;">
+    <div class="container" style="background-color: white; border-radius: 20px; max-width: 800px;">
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                <center>
+                    <h4><br>
+                        Edit Bus
+                    </h4>
+                </center>
+            </div>
+            <div class="col-md-2"><br>
+            <?php if(isset($_GET['bus'])){
+                ?>
+                <a href="#" class="btn btn-outline-danger">Delete Bus</a>
+                <?php
+            } ?>
+            </div>
+        </div>
+        <hr class="hr">
+        <div class="container ">
+            <main class="form-signin" style="width: 100%;">
+                <form action="bus.php" method="POST" style="width: 100%;"  enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <center>
+                                <img src="../images/yogesh_travels.png" style="height: 200px; width:200px; border: isset; border-radius: 50%;border-color: black;">
+                            </center>
+                            <br><br>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="busNo" name="busNo" placeholder="busNo" autocomplete="off">
+                                <label for="busNo">Bus Number</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="startingPoint" name="startingPoint" placeholder="startingPoint" autocomplete="off">
+                                <label for="startingPoint">Start Point</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="destination" name="destination" placeholder="destination" autocomplete="off">
+                                <label for="destination">Destination</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select name="driver" id="driver" class="form-control">
+                                    <option value="0">--Select Driver--</option>
+                                    <option value="driver-1">Driver 1</option>
+                                    <option value="driver-2">Driver 2</option>
+                                    <option value="driver-3">Driver 3</option>
+                                </select>
+                                <label for="driver">Select Driver</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <center>
+                                <input type="submit" value="Save Info" class="btn btn-success" id="submit-btn">
+                            </center>
+                        </div>
+                    </div>
+                    <input type="text" name="type" id="type" style="display: none;" value="insert">
+                </form>
+
+                <br>
+            </main>
+            <?php
+            if (isset($_GET['bus'])) {
+            ?>
+                <hr class="hr">
+
+                <center>
+                    <h4>Stops</h4>
+                </center>
+                <table class="table table-stripped table-hover">
+                    <thead>
+                        <th class="text-center">
+                            #
+                        </th>
+                        <th class="text-center">
+                            Stop
+                        </th>
+                        <th class="text-center">
+                            Income/Expense
+                        </th>
+                        <th class="text-center">
+                            Action
+                        </th>
+                    </thead>
+                    <tbody>
+                        <?php for ($i = 0; $i < 5; $i++) {
+                        ?>
+
+                            <tr>
+                                <td class="text-center">
+                                    1
+                                </td>
+                                <td class="text-center">
+                                    Stop 1
+                                </td>
+                                <td class="text-center">
+                                    Income
+                                </td>
+                                <td class="text-center">
+                                    <a href="#" class="btn btn-outline-danger">Delete</a>
+                                </td>
+                            </tr>
+                        <?php
+                        } ?>
+                    </tbody>
+                </table>
+
+                <hr class="hr">
+                <main class="form-signin" style="width: 100%;">
+                    <form action="bus.php" method="POST" style="width: 100%;">
+                        <center>
+                            <h5>
+                                Add Stop
+                            </h5>
+                        </center>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="stop" name="stop" placeholder="stop" autocomplete="off">
+                                    <label for="stop">Stop</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select name="type" id="type" class="form-control">
+                                        <option value="income">Income</option>
+                                        <option value="expense">Expense</option>
+                                    </select>
+                                    <label for="type">Select Income/Expense</label>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-floating">
+                                    <center>
+                                        <input type="submit" value="Add Stop" class="btn btn-success">
+                                    </center>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </main>
+            <?php } ?>
+        </div>
+    </div><br><br>
+    <?php include "./footer.php"; ?>
