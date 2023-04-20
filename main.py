@@ -4,15 +4,13 @@ from flask_ckeditor import CKEditor
 from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import relationship
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
-from forms import LoginForm, RegisterForm             # CreatePostForm, , , CommentForm
+from forms import LoginForm, RegisterForm, DataForm             # CreatePostForm, , , CommentForm
 from flask_gravatar import Gravatar
 from functools import wraps
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
-ckeditor = CKEditor(app)
 Bootstrap(app)
 
 # CONNECT TO DB
@@ -23,47 +21,31 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 
-##CONFIGURE TABLES
-# DataBase Visualize Diagram: https://github.com/SadSack963/day-69_blog_with_users/blob/master/docs/Class_Diagram.png
-# class BlogPost(db.Model):
-#     __tablename__ = "blog_posts"
-#     id = db.Column(db.Integer, primary_key=True)
-#     title = db.Column(db.String(250), unique=True, nullable=False)
-#     subtitle = db.Column(db.String(250), nullable=False)
-#     date = db.Column(db.String(250), nullable=False)
-#     body = db.Column(db.Text, nullable=False)
-#     img_url = db.Column(db.String(250), nullable=False)
-#
-#     # Create Foreign Key, "users.id" the users refers to the tablename of User.
-#     author_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-#     # Create reference to the User object, the "posts" refers to the posts property in the User class.
-#     author = relationship("User", back_populates="posts")  # db.Column(db.String(250), nullable=False)
-#
-#     comments = relationship("Comment", back_populates="post")
-
-
 class User(UserMixin, db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(150))
-
-    # This will act like a List of BlogPost objects attached to each User.
-    # The "author" refers to the author property in the BlogPost class.
-    # posts = relationship("BlogPost", back_populates="author")
-    # comments = relationship("Comment", back_populates="commenter")
+    admin = db.Column(db.Boolean)
 
 
-# class Comment(db.Model):
-#     __tablename__ = "comments"
-#     id = db.Column(db.Integer, primary_key=True)
-#     comment_body = db.Column(db.Text, nullable=False)
-#     date = db.Column(db.String(250), nullable=False)
-#     post_id = db.Column(db.Integer, db.ForeignKey("blog_posts.id"), nullable=False)
-#     post = db.relationship("BlogPost", back_populates="comments")
-#     commenter_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-#     commenter = db.relationship("User", back_populates="comments")
+class Records(UserMixin, db.Model):
+    __tablename__ = "records"
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DATE)
+    jalgaon_memo = db.Column(db.Integer)
+    jalgaon_luggage = db.Column(db.Integer)
+    dhule_memo = db.Column(db.Integer)
+    manmohan_memo = db.Column(db.Integer)
+    nashik_luggage = db.Column(db.Integer)
+    rokadi = db.Column(db.Integer)
+    return_ = db.Column(db.Integer)
+    advance = db.Column(db.Integer)
+    disel = db.Column(db.Integer)
+    other_expenses = db.Column(db.Integer)
+    maintenance = db.Column(db.Integer)
+    chart_comission = db.Column(db.Integer)
 
 
 db.create_all()
@@ -72,20 +54,25 @@ db.create_all()
 def admin_only(f):
     @wraps(f)
     def wrapper_function(*args, **kwargs):
-        if current_user.id != 1:
+        if current_user.admin != 1:
             return abort(403)
         return f(*args, **kwargs)
     return wrapper_function
 
 
 @login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+def load_user(admin):
+    return User.query.get(admin)
 
 
 @app.route('/')
 def home():
     return render_template("index.html")
+
+
+@app.route("/about")
+def about():
+    return render_template("about.html", logged_in=current_user.is_authenticated)
 
 
 @app.route('/register', methods=["GET", "POST"])
@@ -99,7 +86,8 @@ def register():
         new_user = User(
             name=form.name.data,
             email=form.email.data,
-            password=generate_password_hash(form.password.data, method='pbkdf2:sha256', salt_length=8)
+            password=generate_password_hash(form.password.data, method='pbkdf2:sha256', salt_length=8),
+            admin=form.admin.data
         )
         db.session.add(new_user)
         db.session.commit()
@@ -129,68 +117,59 @@ def login():
     return render_template("login.html", form=form)
 
 
-@app.route('/logout')
+@app.route("/profile", methods=["GET", "POST"])
 @login_required
-def logout():
-    logout_user()
-    return redirect(url_for('home'))
-
-
-# @app.route("/post/<int:post_id>", methods=["GET", "POST"])
-# def show_post(post_id):
-#     requested_post = BlogPost.query.get(post_id)
-#     form = CommentForm()
-#     if form.validate_on_submit():
-#         if not current_user.is_authenticated:
-#             flash("You need to login or register to comment.")
-#             return redirect(url_for("login"))
-#
-#         new_comment = Comment(
-#             comment_body=form.comment_body.data,
-#             date=date.today(),
-#             commenter=current_user,
-#             post=requested_post
-#         )
-#         db.session.add(new_comment)
-#         db.session.commit()
-#     return render_template("post.html", post=requested_post, logged_in=current_user.is_authenticated, form=form)
-
-
-@app.route("/about")
-def about():
-    return render_template("about.html", logged_in=current_user.is_authenticated)
+def profile():
+    return render_template("profile.html")
 
 
 @app.route("/dashboard", methods=["GET", "POST"])
 def dashboard():
-    return render_template("testing.html")
+    return render_template("dashboard.html")
 
 
-# @app.route("/contact")
-# def contact():
-#     return render_template("contact.html", logged_in=current_user.is_authenticated)
-#
-#
-# @app.route("/new-post", methods=["GET", "POST"])
-# @login_required
-# @admin_only
-# def add_new_post():
-#     form = CreatePostForm()
-#     if form.validate_on_submit():
-#         new_post = BlogPost(
-#             title=form.title.data,
-#             subtitle=form.subtitle.data,
-#             body=form.body.data,
-#             img_url=form.img_url.data,
-#             author=current_user,
-#             date=date.today().strftime("%B %d, %Y")
-#         )
-#         db.session.add(new_post)
-#         db.session.commit()
-#         return redirect(url_for("get_all_posts"))
-#     return render_template("make-post.html", form=form, logged_in=current_user.is_authenticated)
-#
-#
+@app.route("/table", methods=["GET", "POST"])
+@login_required
+def table():
+    all_records = Records.query.all()
+    print(all_records[0])
+    return render_template("table.html", all_records=all_records)
+
+
+@app.route("/chart", methods=["GET", "POST"])
+@login_required
+@admin_only
+def chart():
+    return render_template("chart.html")
+
+
+@app.route("/new-data", methods=["GET", "POST"])
+@login_required
+def add_new_data():
+    form = DataForm()
+    if form.validate_on_submit():
+        new_data = Records(
+            date=form.date.data,
+            jalgaon_memo=form.jalgaon_memo.data,
+            jalgaon_luggage=form.jalgaon_luggage.data,
+            dhule_memo=form.dhule_memo.data,
+            manmohan_memo=form.manmohan_memo.data,
+            nashik_luggage=form.nashik_luggage.data,
+            rokadi=form.rokadi.data,
+            return_=form.return_.data,
+            advance=form.advance.data,
+            disel=form.disel.data,
+            other_expenses=form.other_expenses.data,
+            maintenance=form.maintenance.data,
+            chart_comission=form.chart_comission.data,
+        )
+        # print(new_data.date)
+        db.session.add(new_data)
+        db.session.commit()
+        return redirect(url_for("table"))
+    return render_template("add-data.html", form=form)     #, form=form, logged_in=current_user.is_authenticated)
+
+
 # @app.route("/edit-post/<int:post_id>", methods=["GET", "POST"])
 # @login_required
 # @admin_only
@@ -223,6 +202,12 @@ def dashboard():
 #     db.session.delete(post_to_delete)
 #     db.session.commit()
 #     return redirect(url_for('get_all_posts'))
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
 
 
 if __name__ == "__main__":
