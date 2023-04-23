@@ -287,3 +287,7 @@
     background: var(--dark);
     border-color: var(--primary);
 }
+
+.bg-secondary {
+    background-color: var(--primary);
+}
