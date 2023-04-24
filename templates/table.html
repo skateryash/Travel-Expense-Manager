@@ -2,17 +2,10 @@
 <html lang="en">
 
 {% include "dashboard-header.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
 
 <body>
     <div class="container-fluid position-relative d-flex p-0">
-{#        <!-- Spinner Start -->#}
-{#        <div id="spinner" class="show bg-dark position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">#}
-{#            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">#}
-{#                <span class="sr-only">Loading...</span>#}
-{#            </div>#}
-{#        </div>#}
-{#        <!-- Spinner End -->#}
-
 
         <!-- Sidebar Start -->
         <div class="sidebar pe-4 pb-3">
@@ -151,224 +144,30 @@
             </nav>
             <!-- Navbar End -->
 
+            <!-- Date Picker Start -->
+            <div class="container-fluid pt-4 px-4">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="bg-secondary rounded h-100 p-4">
+
+                            <form action="{{ url_for("table")}}" method="post">
+                                <h6 class="mb-1">Select Date Range: <input type="month" name="mpicker"> <button type="submit">Search</button> </h6>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Date Picker End -->
+
+
 
             <!-- Table Start -->
             <div class="container-fluid pt-4 px-4">
                 <div class="row g-4">
-                    <!-- <div class="col-sm-12 col-xl-6">
-                        <div class="bg-secondary rounded h-100 p-4">
-                            <h6 class="mb-4">Basic Table</h6>
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">#</th>
-                                        <th scope="col">First Name</th>
-                                        <th scope="col">Last Name</th>
-                                        <th scope="col">Email</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <th scope="row">1</th>
-                                        <td>John</td>
-                                        <td>Doe</td>
-                                        <td>jhon@email.com</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">2</th>
-                                        <td>Mark</td>
-                                        <td>Otto</td>
-                                        <td>mark@email.com</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">3</th>
-                                        <td>Jacob</td>
-                                        <td>Thornton</td>
-                                        <td>jacob@email.com</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="col-sm-12 col-xl-6">
-                        <div class="bg-secondary rounded h-100 p-4">
-                            <h6 class="mb-4">Accented Table</h6>
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">#</th>
-                                        <th scope="col">First Name</th>
-                                        <th scope="col">Last Name</th>
-                                        <th scope="col">Email</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <th scope="row">1</th>
-                                        <td>John</td>
-                                        <td>Doe</td>
-                                        <td>jhon@email.com</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">2</th>
-                                        <td>Mark</td>
-                                        <td>Otto</td>
-                                        <td>mark@email.com</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">3</th>
-                                        <td>Jacob</td>
-                                        <td>Thornton</td>
-                                        <td>jacob@email.com</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="col-sm-12 col-xl-6">
-                        <div class="bg-secondary rounded h-100 p-4">
-                            <h6 class="mb-4">Hoverable Table</h6>
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">#</th>
-                                        <th scope="col">First Name</th>
-                                        <th scope="col">Last Name</th>
-                                        <th scope="col">Email</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <th scope="row">1</th>
-                                        <td>John</td>
-                                        <td>Doe</td>
-                                        <td>jhon@email.com</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">2</th>
-                                        <td>Mark</td>
-                                        <td>Otto</td>
-                                        <td>mark@email.com</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">3</th>
-                                        <td>Jacob</td>
-                                        <td>Thornton</td>
-                                        <td>jacob@email.com</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="col-sm-12 col-xl-6">
-                        <div class="bg-secondary rounded h-100 p-4">
-                            <h6 class="mb-4">Color Table</h6>
-                            <table class="table table-dark">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">#</th>
-                                        <th scope="col">First Name</th>
-                                        <th scope="col">Last Name</th>
-                                        <th scope="col">Email</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <th scope="row">1</th>
-                                        <td>John</td>
-                                        <td>Doe</td>
-                                        <td>jhon@email.com</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">2</th>
-                                        <td>Mark</td>
-                                        <td>Otto</td>
-                                        <td>mark@email.com</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">3</th>
-                                        <td>Jacob</td>
-                                        <td>Thornton</td>
-                                        <td>jacob@email.com</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="col-sm-12 col-xl-6">
-                        <div class="bg-secondary rounded h-100 p-4">
-                            <h6 class="mb-4">Bordered Table</h6>
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">#</th>
-                                        <th scope="col">First Name</th>
-                                        <th scope="col">Last Name</th>
-                                        <th scope="col">Email</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <th scope="row">1</th>
-                                        <td>John</td>
-                                        <td>Doe</td>
-                                        <td>jhon@email.com</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">2</th>
-                                        <td>Mark</td>
-                                        <td>Otto</td>
-                                        <td>mark@email.com</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">3</th>
-                                        <td>Jacob</td>
-                                        <td>Thornton</td>
-                                        <td>jacob@email.com</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="col-sm-12 col-xl-6">
-                        <div class="bg-secondary rounded h-100 p-4">
-                            <h6 class="mb-4">Table Without Border</h6>
-                            <table class="table table-borderless">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">#</th>
-                                        <th scope="col">First Name</th>
-                                        <th scope="col">Last Name</th>
-                                        <th scope="col">Email</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <th scope="row">1</th>
-                                        <td>John</td>
-                                        <td>Doe</td>
-                                        <td>jhon@email.com</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">2</th>
-                                        <td>Mark</td>
-                                        <td>Otto</td>
-                                        <td>mark@email.com</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">3</th>
-                                        <td>Jacob</td>
-                                        <td>Thornton</td>
-                                        <td>jacob@email.com</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div> -->
-                    <!-- end -->
                     <div class="col-12">
                         <div class="bg-secondary rounded h-100 p-4">
-                            <h6 class="mb-4">Responsive Table</h6>
+                            <h6 class="mb-4">Monthly Data</h6>
                             <div class="table-responsive">
                                 <table class="table" style="color: black ! important">
                                     <thead>
@@ -392,80 +191,47 @@
                                     </thead>
                                     <tbody>
 
-                                        {% for record in all_records %}
+                                        {% for i in range(length) %}
                                         <tr>
 
-                                            <th scope="row">{{ record.id }}</th>
-                                            <td>{{ record.date }}</td>
-                                            <td>{{ record.jalgaon_memo }}</td>
-                                            <td>{{ record.jalgaon_luggage }}</td>
-                                            <td>{{ record.dhule_memo }}</td>
-                                            <td>{{ record.manmohan_memo }}</td>
-                                            <td>{{ record.nashik_luggage }}</td>
+                                            <th scope="row">{{ df.iloc[[i]].id.to_string(index=False) }}</th>
+                                            <td>{{ df.iloc[[i]].date.to_string(index=False) }}</td>
+                                            <td>{{ df.iloc[[i]].jalgaon_memo.to_string(index=False) }}</td>
+                                            <td>{{ df.iloc[[i]].jalgaon_luggage.to_string(index=False) }}</td>
+                                            <td>{{ df.iloc[[i]].dhule_memo.to_string(index=False) }}</td>
+                                            <td>{{ df.iloc[[i]].manmohan_memo.to_string(index=False) }}</td>
+                                            <td>{{ df.iloc[[i]].nashik_luggage.to_string(index=False) }}</td>
+                                            <td>{{ df.iloc[[i]].rokadi.to_string(index=False) }}</td>
+                                            <td>{{ df.iloc[[i]].return_.to_string(index=False) }}</td>
 
-                                            <td>{{ record.rokadi }}</td>
-                                            <td>{{ record.return_ }}</td>
-                                            <td>{{ record.advance }}</td>
-                                            <td>{{ record.disel }}</td>
-                                            <td>{{ record.other_expenses }}</td>
-                                            <td>{{ record.maintenance }}</td>
-                                            <td>{{ record.chart_comission }}</td>
+                                            <td>{{ df.iloc[[i]].advance.to_string(index=False) }}</td>
+                                            <td>{{ df.iloc[[i]].disel.to_string(index=False) }}</td>
+                                            <td>{{ df.iloc[[i]].other_expenses.to_string(index=False) }}</td>
+                                            <td>{{ df.iloc[[i]].maintenance.to_string(index=False) }}</td>
+                                            <td>{{ df.iloc[[i]].chart_comission.to_string(index=False) }}</td>
 
                                         </tr>
                                         {% endfor %}
 
 
-{##}
-{#                                        <tr>#}
-{#                                            <th scope="row">2</th>#}
-{#                                            <td>4/5/22</td>#}
-{#                                            <td>11120</td>#}
-{#                                            <td>2110</td>#}
-{#                                            <td>580</td>#}
-{#                                            <td>4420</td>#}
-{#                                            <td>2060</td>#}
-{##}
-{#                                            <td>0</td>#}
-{#                                            <td>15790</td>#}
-{#                                            <td>4500</td>#}
-{#                                            <td>23600</td>#}
-{#                                            <td>400</td>#}
-{#                                            <td>0</td>#}
-{#                                            <td>380</td>#}
-{#                                        </tr>#}
-{#                                        <tr>#}
-{#                                            <th scope="row">3</th>#}
-{#                                            <td>6/5/22</td>#}
-{#                                            <td>11120</td>#}
-{#                                            <td>2110</td>#}
-{#                                            <td>580</td>#}
-{#                                            <td>4420</td>#}
-{#                                            <td>2060</td>#}
-{##}
-{#                                            <td>0</td>#}
-{#                                            <td>15790</td>#}
-{#                                            <td>4500</td>#}
-{#                                            <td>23600</td>#}
-{#                                            <td>400</td>#}
-{#                                            <td>0</td>#}
-{#                                            <td>380</td>#}
-{#                                        </tr>#}
                                         <tr>
                                             <th scope="row">Total</th>
                                             <td></td>
-                                            <td>365980</td>
-                                            <td>27640</td>
-                                            <td>27790</td>
-                                            <td>100000</td>
-                                            <td>46360</td>
+                                            <td>{{ df.jalgaon_memo.sum() }}</td>
+                                            <td>{{ df.jalgaon_luggage.sum() }}</td>
+                                            <td>{{ df.dhule_memo.sum() }}</td>
+                                            <td>{{ df.manmohan_memo.sum() }}</td>
+                                            <td>{{ df.nashik_luggage.sum() }}</td>
+                                            <td>{{ df.rokadi.sum() }}</td>
+                                            <td>{{ df.return_.sum() }}</td>
 
-                                            <td>0</td>
-                                            <td>192340</td>
-                                            <td>67500</td>
-                                            <td>363150</td>
-                                            <td>6850</td>
-                                            <td>6470</td>
-                                            <td>8800</td>
+                                            <td>{{ df.advance.sum() }}</td>
+                                            <td>{{ df.disel.sum() }}</td>
+                                            <td>{{ df.other_expenses.sum() }}</td>
+                                            <td>{{ df.maintenance.sum() }}</td>
+                                            <td>{{ df.chart_comission.sum() }}</td>
+
+
                                         </tr>
 
                                     </tbody>

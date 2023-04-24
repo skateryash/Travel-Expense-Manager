@@ -1,7 +1,9 @@
+from datetime import datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField, widgets, DateField, IntegerField, validators, BooleanField
 from wtforms.validators import DataRequired, URL
 from wtforms.widgets.html5 import NumberInput
+from wtforms.fields.html5 import DateField, TimeField
 
 
 class RegisterForm(FlaskForm):
@@ -19,7 +21,7 @@ class LoginForm(FlaskForm):
 
 
 class DataForm(FlaskForm):
-    date = DateField('Start Date', format='%d/%m/%Y', validators=(validators.Optional(),))
+    date = DateField('Start Date',  validators=(validators.Optional(),))
     jalgaon_memo = IntegerField("Jalgaon Memo", widget=NumberInput())
     jalgaon_luggage = IntegerField("Jalgaon luggage", widget=NumberInput())
     dhule_memo = IntegerField("Dhule Memo", widget=NumberInput())

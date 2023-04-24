@@ -2,12 +2,14 @@ from flask import Flask, render_template, redirect, url_for, flash, abort, reque
 from flask_bootstrap import Bootstrap
 from flask_ckeditor import CKEditor
 from datetime import date
+from sqlalchemy import create_engine
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
-from forms import LoginForm, RegisterForm, DataForm             # CreatePostForm, , , CommentForm
+from forms import LoginForm, RegisterForm, DataForm  # CreatePostForm, , , CommentForm
 from flask_gravatar import Gravatar
 from functools import wraps
+import pandas as pd
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
@@ -57,6 +59,7 @@ def admin_only(f):
         if current_user.admin != 1:
             return abort(403)
         return f(*args, **kwargs)
+
     return wrapper_function
 
 
@@ -117,6 +120,25 @@ def login():
     return render_template("login.html", form=form)
 
 
+def get_monthly_data(month, year):
+    query = f'''
+                    SELECT *
+                    FROM records
+                    WHERE strftime('%m', date) = '{month}' 
+                    AND strftime('%Y', date) = '{year}'
+                    ORDER BY date ASC;
+                '''
+    # print(query)
+
+    # SQLAlchemy connectable
+    cnx = create_engine('sqlite:///travels.db').connect()
+
+    # table named 'records' will be returned as a dataframe.
+    dataframe = pd.read_sql_query(query, con=cnx)
+
+    return dataframe
+
+
 @app.route("/profile", methods=["GET", "POST"])
 @login_required
 def profile():
@@ -125,20 +147,35 @@ def profile():
 
 @app.route("/dashboard", methods=["GET", "POST"])
 def dashboard():
-    return render_template("dashboard.html")
+    df = get_monthly_data({date.today().month}, {date.today().year})
+    print(df.jalgaon_memo.sum())
+    income = df.jalgaon_memo.sum() + df.jalgaon_luggage.sum() + \
+             df.dhule_memo.sum() + df.manmohan_memo.sum() + \
+             df.nashik_luggage.sum() + df.rokadi.sum() + df.return_.sum()
+    print(income)
+    return render_template("dashboard.html", user=current_user, df=df)
 
 
 @app.route("/table", methods=["GET", "POST"])
 @login_required
 def table():
-    all_records = Records.query.all()
-    print(all_records[0])
-    return render_template("table.html", all_records=all_records)
+    df = get_monthly_data({date.today().month}, {date.today().year})
+    length = len(df)
+    # print(df)
+
+    if request.method == "POST":
+        month = request.form.get("mpicker")[5:]
+        year = request.form.get("mpicker")[:4]
+        df = get_monthly_data(month, year)
+        length = len(df)
+
+        return render_template("table.html", df=df, length=length)
+
+    return render_template("table.html", df=df, length=length)  # all_records=all_records)
 
 
 @app.route("/chart", methods=["GET", "POST"])
 @login_required
-@admin_only
 def chart():
     return render_template("chart.html")
 
@@ -167,7 +204,7 @@ def add_new_data():
         db.session.add(new_data)
         db.session.commit()
         return redirect(url_for("table"))
-    return render_template("add-data.html", form=form)     #, form=form, logged_in=current_user.is_authenticated)
+    return render_template("add-data.html", form=form)  # , form=form, logged_in=current_user.is_authenticated)
 
 
 # @app.route("/edit-post/<int:post_id>", methods=["GET", "POST"])

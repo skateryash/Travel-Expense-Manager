@@ -27,8 +27,12 @@
                         <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
                     </div>
                     <div class="ms-3">
-                        <h6 class="mb-0">Yash</h6>
-                        <span>Admin</span>
+                        <h6 class="mb-0">{{ user.name }}</h6>
+                        {% if user.admin %}
+                            <span>Admin</span>
+                        {% else %}
+                            <span>User</span>
+                        {% endif %}
                     </div>
                 </div>
 
@@ -65,7 +69,7 @@
         <div class="content">
             <!-- Navbar Start -->
             <nav class="navbar navbar-expand bg-secondary navbar-dark sticky-top px-4 py-0">
-                <a href="dashboard.html" class="navbar-brand d-flex d-lg-none me-4">
+                <a href="{{ url_for('dashboard') }}" class="navbar-brand d-flex d-lg-none me-4">
                     <h2 class="text-primary mb-0"><i class="fa fa-user-edit"></i></h2>
                 </a>
                 <a href="#" class="sidebar-toggler flex-shrink-0">
@@ -142,7 +146,7 @@
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                             <img class="rounded-circle me-lg-2" src="{{ url_for('static', filename='/images/user.jpg')}}" alt="" style="width: 40px; height: 40px;">
-                            <span class="d-none d-lg-inline-flex">Yash</span>
+                            <span class="d-none d-lg-inline-flex">{{ user.name }}</span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0">
                             <a href="#" class="dropdown-item">My Profile</a>
@@ -163,7 +167,7 @@
                             <i class="fa fa-chart-line fa-3x text-primary"></i>
                             <div class="ms-3">
                                 <p class="mb-2">Total Income</p>
-                                <h6 class="mb-0">629020</h6>
+                                <h6 class="mb-0">{{ df.jalgaon_memo.sum() + df.jalgaon_luggage.sum() + df.dhule_memo.sum() + df.manmohan_memo.sum() + df.nashik_luggage.sum() + df.rokadi.sum() + df.return_.sum() }}</h6>
                             </div>
                         </div>
                     </div>
