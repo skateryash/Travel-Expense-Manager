@@ -1,18 +1,18 @@
 from flask import Flask, render_template, redirect, url_for, flash, abort, request
 from flask_bootstrap import Bootstrap
-from flask_ckeditor import CKEditor
 from datetime import date
 from sqlalchemy import create_engine
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
-from forms import LoginForm, RegisterForm, DataForm  # CreatePostForm, , , CommentForm
+from forms import LoginForm, RegisterForm, DataForm
 from flask_gravatar import Gravatar
 from functools import wraps
 import pandas as pd
+import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 Bootstrap(app)
 
 # CONNECT TO DB
@@ -32,10 +32,9 @@ class User(UserMixin, db.Model):
     admin = db.Column(db.Boolean)
 
 
-class Records(UserMixin, db.Model):
-    __tablename__ = "records"
-    id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.DATE)
+class Income(UserMixin, db.Model):
+    __tablename__ = "income"
+    date = db.Column(db.DATE, primary_key=True)
     jalgaon_memo = db.Column(db.Integer)
     jalgaon_luggage = db.Column(db.Integer)
     dhule_memo = db.Column(db.Integer)
@@ -43,11 +42,29 @@ class Records(UserMixin, db.Model):
     nashik_luggage = db.Column(db.Integer)
     rokadi = db.Column(db.Integer)
     return_ = db.Column(db.Integer)
+
+    lab_payment = db.Column(db.Integer)
+    difference = db.Column(db.Integer)
+
+
+class Expenses(UserMixin, db.Model):
+    __tablename__ = "expenses"
+    date = db.Column(db.DATE, primary_key=True)
     advance = db.Column(db.Integer)
-    disel = db.Column(db.Integer)
+    diesel = db.Column(db.Integer)
     other_expenses = db.Column(db.Integer)
     maintenance = db.Column(db.Integer)
-    chart_comission = db.Column(db.Integer)
+    chart_commission = db.Column(db.Integer)
+
+    drivers_salary = db.Column(db.Integer)
+    cleaner_salary = db.Column(db.Integer)
+    hinduza_finance = db.Column(db.Integer)
+    road_tax = db.Column(db.Integer)
+    gprs = db.Column(db.Integer)
+    bedsheet_washing = db.Column(db.Integer)
+    jay_ambe = db.Column(db.Integer)
+    pigmi = db.Column(db.Integer)
+    staff_payment = db.Column(db.Integer)
 
 
 db.create_all()
@@ -120,11 +137,15 @@ def login():
     return render_template("login.html", form=form)
 
 
-def get_monthly_data(month, year):
+def get_monthly_data(month, year, table):
+    # print(month, year)
+    num = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    if month in num:
+        month = '0' + str(month)
     query = f'''
                     SELECT *
-                    FROM records
-                    WHERE strftime('%m', date) = '{month}' 
+                    FROM {table}
+                    WHERE strftime('%m', date) = '{month}'
                     AND strftime('%Y', date) = '{year}'
                     ORDER BY date ASC;
                 '''
@@ -147,31 +168,57 @@ def profile():
 
 @app.route("/dashboard", methods=["GET", "POST"])
 def dashboard():
-    df = get_monthly_data({date.today().month}, {date.today().year})
-    print(df.jalgaon_memo.sum())
-    income = df.jalgaon_memo.sum() + df.jalgaon_luggage.sum() + \
-             df.dhule_memo.sum() + df.manmohan_memo.sum() + \
-             df.nashik_luggage.sum() + df.rokadi.sum() + df.return_.sum()
-    print(income)
-    return render_template("dashboard.html", user=current_user, df=df)
+    income_category = ['Jalgaon memo', 'Jalgaon luggage', 'Dhule office memo', 'Manmohan memo', 'Nashik office luggage',
+                       'Rokadi', 'Return ticket payment', 'Lab payment', 'Difference amount of payment']
+    expenses_category = ['Advance', 'Diseal', 'Other Expenses', 'Maintainance', 'Chart commision', 'Drivers payment',
+                         'Cleaner Payment', 'Hinduza finance', 'Road tax', 'GPRS', 'Bed sheet washing', 'Jay ambe',
+                         'pigmi', 'Staff payment']
+
+    income_df = get_monthly_data(month=date.today().month, year=date.today().year, table="income").iloc[:, 1:].sum().to_frame().reset_index()
+    # income_df = get_monthly_data(month="03", year="2023", table="income").iloc[:, 1:].sum().to_frame().reset_index()
+    income_df.columns = ['Column', 'Value']
+    income_df['Column'] = income_category
+    income_df.loc[len(income_df)] = ['Total', income_df['Value'].sum()]
+
+    expenses_df = get_monthly_data(month=date.today().month, year=date.today().year, table="expenses").iloc[:, 1:].sum().to_frame().reset_index()
+    # expenses_df = get_monthly_data(month="03", year="2023", table="expenses").iloc[:, 1:].sum().to_frame().reset_index()
+    expenses_df.columns = ['Column', 'Value']
+    expenses_df['Column'] = expenses_category
+    expenses_df.loc[len(expenses_df)] = ['Total', expenses_df['Value'].sum()]
+
+    # print(income_df)
+    # print(type(expenses_df))
+
+    return render_template("dashboard.html", user=current_user, income=income_df, expenses=expenses_df)
+
+
+def monthly_data(month, year):
+    category = ['Date', 'Jalgaon memo', 'Jalgaon luggage', 'Dhule memo', 'Manmohan memo', 'Nashik luggage',
+                'Rokadi', 'Return Ticket', 'Advance', 'Diseal', 'Other Expenses', 'Maintainance', 'Chart commision']
+    income_df = get_monthly_data(month=month, year=year, table="income").iloc[:, :8]
+    expenses_df = get_monthly_data(month=month, year=year, table="expenses").iloc[:, 1:6]
+
+    df = pd.concat([income_df, expenses_df], axis=1)
+    df.columns = category
+    df = pd.concat([df, df.sum(numeric_only=True).rename('Total').to_frame().T], ignore_index=True)
+
+    df.fillna('Total', inplace=True)
+
+    return df
 
 
 @app.route("/table", methods=["GET", "POST"])
 @login_required
 def table():
-    df = get_monthly_data({date.today().month}, {date.today().year})
-    length = len(df)
-    # print(df)
+    df = monthly_data(month=date.today().month, year=date.today().year)
 
     if request.method == "POST":
         month = request.form.get("mpicker")[5:]
         year = request.form.get("mpicker")[:4]
-        df = get_monthly_data(month, year)
-        length = len(df)
+        df = monthly_data(month=month, year=year)
+        return render_template("table.html", df=df)
 
-        return render_template("table.html", df=df, length=length)
-
-    return render_template("table.html", df=df, length=length)  # all_records=all_records)
+    return render_template("table.html", df=df)
 
 
 @app.route("/chart", methods=["GET", "POST"])
@@ -185,7 +232,7 @@ def chart():
 def add_new_data():
     form = DataForm()
     if form.validate_on_submit():
-        new_data = Records(
+        new_income_data = Income(
             date=form.date.data,
             jalgaon_memo=form.jalgaon_memo.data,
             jalgaon_luggage=form.jalgaon_luggage.data,
@@ -194,14 +241,30 @@ def add_new_data():
             nashik_luggage=form.nashik_luggage.data,
             rokadi=form.rokadi.data,
             return_=form.return_.data,
+            lab_payment=form.lab_payment.data,
+            difference=form.difference.data
+        )
+
+        new_expenses_data = Expenses(
+            date=form.date.data,
             advance=form.advance.data,
-            disel=form.disel.data,
+            diesel=form.diesel.data,
             other_expenses=form.other_expenses.data,
             maintenance=form.maintenance.data,
-            chart_comission=form.chart_comission.data,
+            chart_commission=form.chart_commission.data,
+            drivers_salary=form.drivers_salary.data,
+            cleaner_salary=form.cleaner_salary.data,
+            hinduza_finance=form.hinduza_finance.data,
+            road_tax=form.road_tax.data,
+            gprs=form.gprs.data,
+            bedsheet_washing=form.bedsheet_washing.data,
+            jay_ambe=form.jay_ambe.data,
+            pigmi=form.pigmi.data,
+            staff_payment=form.staff_payment.data,
         )
-        # print(new_data.date)
-        db.session.add(new_data)
+
+        db.session.add(new_income_data)
+        db.session.add(new_expenses_data)
         db.session.commit()
         return redirect(url_for("table"))
     return render_template("add-data.html", form=form)  # , form=form, logged_in=current_user.is_authenticated)
