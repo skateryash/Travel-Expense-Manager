@@ -277,7 +277,6 @@ def edit_record(date_value):
     income_to_edit = Income.query.get(date_obj)
     expenses_to_edit = Expenses.query.get(date_obj)
 
-    # post = BlogPost.query.get(post_id)
     edit_form = DataForm(
         date=income_to_edit.date,
         jalgaon_memo=income_to_edit.jalgaon_memo,
