@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, flash, abort, request
 from flask_bootstrap import Bootstrap
-from datetime import date
+from datetime import date, datetime
 from sqlalchemy import create_engine
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
@@ -270,38 +270,87 @@ def add_new_data():
     return render_template("add-data.html", form=form)  # , form=form, logged_in=current_user.is_authenticated)
 
 
-# @app.route("/edit-post/<int:post_id>", methods=["GET", "POST"])
-# @login_required
-# @admin_only
-# def edit_post(post_id):
-#     post = BlogPost.query.get(post_id)
-#     edit_form = CreatePostForm(
-#         title=post.title,
-#         subtitle=post.subtitle,
-#         img_url=post.img_url,
-#         author=post.author,
-#         body=post.body
-#     )
-#     if edit_form.validate_on_submit():
-#         post.title = edit_form.title.data
-#         post.subtitle = edit_form.subtitle.data
-#         post.img_url = edit_form.img_url.data
-#         post.author = request.form.get("author")          # edit_form.author.data
-#         post.body = edit_form.body.data
-#         db.session.commit()
-#         return redirect(url_for("show_post", post_id=post.id))
-#
-#     return render_template("make-post.html", form=edit_form, logged_in=current_user.is_authenticated)
-#
-#
-# @app.route("/delete/<int:post_id>")
-# @login_required
-# @admin_only
-# def delete_post(post_id):
-#     post_to_delete = BlogPost.query.get(post_id)
-#     db.session.delete(post_to_delete)
-#     db.session.commit()
-#     return redirect(url_for('get_all_posts'))
+@app.route("/edit-post/<string:date_value>", methods=["GET", "POST"])
+@login_required
+def edit_record(date_value):
+    date_obj = datetime.strptime(date_value, "%Y-%m-%d").date()  # Convert the string to a Python date object
+    income_to_edit = Income.query.get(date_obj)
+    expenses_to_edit = Expenses.query.get(date_obj)
+
+    # post = BlogPost.query.get(post_id)
+    edit_form = DataForm(
+        date=income_to_edit.date,
+        jalgaon_memo=income_to_edit.jalgaon_memo,
+        jalgaon_luggage=income_to_edit.jalgaon_luggage,
+        dhule_memo=income_to_edit.dhule_memo,
+        manmohan_memo=income_to_edit.manmohan_memo,
+        nashik_luggage=income_to_edit.nashik_luggage,
+        rokadi=income_to_edit.rokadi,
+        return_=income_to_edit.return_,
+        lab_payment=income_to_edit.lab_payment,
+        difference=income_to_edit.difference,
+
+        advance=expenses_to_edit.advance,
+        diesel=expenses_to_edit.diesel,
+        other_expenses=expenses_to_edit.other_expenses,
+        maintenance=expenses_to_edit.maintenance,
+        chart_commission=expenses_to_edit.chart_commission,
+        drivers_salary=expenses_to_edit.drivers_salary,
+        cleaner_salary=expenses_to_edit.cleaner_salary,
+        hinduza_finance=expenses_to_edit.hinduza_finance,
+        road_tax=expenses_to_edit.road_tax,
+        gprs=expenses_to_edit.gprs,
+        bedsheet_washing=expenses_to_edit.bedsheet_washing,
+        jay_ambe=expenses_to_edit.jay_ambe,
+        pigmi=expenses_to_edit.pigmi,
+        staff_payment=expenses_to_edit.staff_payment,
+    )
+
+    if edit_form.validate_on_submit():
+        income_to_edit.date = edit_form.date.data
+        income_to_edit.jalgaon_memo = edit_form.jalgaon_memo.data
+        income_to_edit.jalgaon_luggage = edit_form.jalgaon_luggage.data
+        income_to_edit.dhule_memo = edit_form.dhule_memo.data
+        income_to_edit.manmohan_memo = edit_form.manmohan_memo.data
+        income_to_edit.nashik_luggage = edit_form.nashik_luggage.data
+        income_to_edit.rokadi = edit_form.rokadi.data
+        income_to_edit.return_ = edit_form.return_.data
+        income_to_edit.lab_payment = edit_form.lab_payment.data
+        income_to_edit.difference = edit_form.difference.data
+
+        expenses_to_edit.date = edit_form.date.data
+        expenses_to_edit.advance = edit_form.advance.data
+        expenses_to_edit.diesel = edit_form.diesel.data
+        expenses_to_edit.other_expenses = edit_form.other_expenses.data
+        expenses_to_edit.maintenance = edit_form.maintenance.data
+        expenses_to_edit.chart_commission = edit_form.chart_commission.data
+        expenses_to_edit.drivers_salary = edit_form.drivers_salary.data
+        expenses_to_edit.cleaner_salary = edit_form.cleaner_salary.data
+        expenses_to_edit.hinduza_finance = edit_form.hinduza_finance.data
+        expenses_to_edit.road_tax = edit_form.road_tax.data
+        expenses_to_edit.gprs = edit_form.gprs.data
+        expenses_to_edit.bedsheet_washing = edit_form.bedsheet_washing.data
+        expenses_to_edit.jay_ambe = edit_form.jay_ambe.data
+        expenses_to_edit.pigmi = edit_form.pigmi.data
+        expenses_to_edit.staff_payment = edit_form.staff_payment.data
+
+        db.session.commit()
+        return redirect(url_for("table"))
+
+    return render_template("edit-data.html", form=edit_form)
+
+
+@app.route("/delete/<string:date_value>")
+@login_required
+def delete_record(date_value):
+    date_obj = datetime.strptime(date_value, "%Y-%m-%d").date()  # Convert the string to a Python date object
+    income_to_delete = Income.query.get(date_obj)
+    expenses_to_delete = Expenses.query.get(date_obj)
+    db.session.delete(income_to_delete)
+    db.session.delete(expenses_to_delete)
+    db.session.commit()
+    return redirect(url_for('table'))
+
 
 @app.route('/logout')
 @login_required
