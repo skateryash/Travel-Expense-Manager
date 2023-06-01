@@ -1,9 +1,8 @@
-from datetime import datetime
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, PasswordField, widgets, DateField, IntegerField, validators, BooleanField
-from wtforms.validators import DataRequired, URL
-from wtforms.widgets.html5 import NumberInput
-from wtforms.fields.html5 import DateField, TimeField
+from wtforms import StringField, SubmitField, PasswordField, IntegerField, validators, BooleanField
+from wtforms.validators import DataRequired
+from wtforms.widgets import NumberInput
+from wtforms.fields import DateField
 
 
 class RegisterForm(FlaskForm):
@@ -52,5 +51,3 @@ class DataForm(FlaskForm):
     staff_payment = IntegerField("Staff Payment", widget=NumberInput(), default=0)
 
     submit = SubmitField("Add")
-
-
