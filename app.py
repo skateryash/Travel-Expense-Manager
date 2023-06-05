@@ -152,7 +152,7 @@ def get_monthly_data(month, year, table):
     # print(query)
 
     # SQLAlchemy connectable
-    cnx = create_engine('sqlite:///travels.db').connect()
+    cnx = create_engine(os.getenv('DATABASE_URL')).connect()
 
     # table named 'records' will be returned as a dataframe.
     dataframe = pd.read_sql_query(query, con=cnx)
