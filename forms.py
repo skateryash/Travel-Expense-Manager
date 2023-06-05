@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField, IntegerField, validators, BooleanField
 from wtforms.validators import DataRequired
@@ -21,7 +22,7 @@ class LoginForm(FlaskForm):
 
 class DataForm(FlaskForm):
     # Income fields
-    date = DateField('Start Date',  validators=(validators.Optional(),))
+    date = DateField('Start Date', validators=[validators.Optional()], default=datetime.today)
     jalgaon_memo = IntegerField("Jalgaon Memo", widget=NumberInput(), default=0)
     jalgaon_luggage = IntegerField("Jalgaon Luggage", widget=NumberInput(), default=0)
     dhule_memo = IntegerField("Dhule Memo", widget=NumberInput(), default=0)

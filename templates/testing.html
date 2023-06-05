@@ -1,5 +1,12 @@
 {% include "header.html" %}
 
 <h1>Testing Successful</h1>
+<h4>Error: {{ error_message }}</h4>
+<form>
+        <label for="my-textarea">Text Area:</label>
+        <textarea id="my-textarea" name="my-textarea" rows="4" cols="50"></textarea>
+        <br>
+        <button type="submit">Submit</button>
+</form>
 
 {% include "footer.html" %}

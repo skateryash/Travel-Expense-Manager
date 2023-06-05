@@ -9,6 +9,7 @@ from forms import LoginForm, RegisterForm, DataForm
 from flask_gravatar import Gravatar
 from functools import wraps
 import pandas as pd
+import psycopg2
 import os
 
 app = Flask(__name__)
@@ -85,6 +86,26 @@ def load_user(admin):
     return User.query.get(admin)
 
 
+# @app.route('/database', methods=["GET", "POST"])
+# def database_connection():
+#     try:
+#         if request.method == 'POST':
+#             textarea_value = request.form.get('my-textarea')
+#
+#             connection = psycopg2.connect(os.getenv('DATABASE_URL'))
+#
+#             # Execute the query on the database
+#             cursor = connection.cursor()
+#             cursor.execute(textarea_value)
+#
+#         return render_template("testing.html")
+#
+#     except psycopg2.Error as e:
+#         # Handle the exception or display an error message
+#         error_message = f"Database Error: {str(e)}"
+#         return render_template("testing.html", error_message=error_message)
+
+
 @app.route('/')
 def home():
     return render_template("index.html")
@@ -142,20 +163,23 @@ def get_monthly_data(month, year, table):
     num = [1, 2, 3, 4, 5, 6, 7, 8, 9]
     if month in num:
         month = '0' + str(month)
-    query = f'''
-                    SELECT *
-                    FROM {table}
-                    WHERE strftime('%m', date) = '{month}'
-                    AND strftime('%Y', date) = '{year}'
-                    ORDER BY date ASC;
-                '''
+
+    query = f"""
+            SELECT *
+            FROM {table}
+            WHERE EXTRACT(MONTH FROM date) = '{month}'
+            AND EXTRACT(YEAR FROM date) = '{year}'
+            ORDER BY date ASC;
+        """
     # print(query)
 
     # SQLAlchemy connectable
-    cnx = create_engine(os.getenv('DATABASE_URL')).connect()
+    # local_cnx = create_engine(os.getenv('DATABASE_URL')).connect()
+    remote_cnx = psycopg2.connect(os.getenv('DATABASE_URL'))
 
     # table named 'records' will be returned as a dataframe.
-    dataframe = pd.read_sql_query(query, con=cnx)
+    dataframe = pd.read_sql_query(query, con=remote_cnx)
+    # cnx.close()
 
     return dataframe
 
